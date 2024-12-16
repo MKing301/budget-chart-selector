@@ -28,20 +28,33 @@ def budget_chart(request):
     totals = filtered_df['total'].tolist()
     budgets = filtered_df['budget'].tolist()
     
+    # Prepare separate datasets for under and over budget
+    under_budget = [total if total < budget else None for total, budget in zip(totals, budgets)]
+    over_budget = [total if total >= budget else None for total, budget in zip(totals, budgets)]
+    
     chart_data = {
         'labels': months,
         'datasets': [
             {
-                'label': 'Actual Spending',
-                'data': totals,
-                'backgroundColor': '#00FF00',  # Solid green
-                'borderColor': '#00FF00',
-                'borderWidth': 1
+                'label': 'Under Budget',
+                'data': under_budget,
+                'backgroundColor': '#FF0000',
+                'borderColor': '#FF0000',
+                'borderWidth': 1,
+                'stack': 'spending'
             },
             {
-                'label': 'Budget',
+                'label': 'Met Budget',
+                'data': over_budget,
+                'backgroundColor': '#00FF00',
+                'borderColor': '#00FF00',
+                'borderWidth': 1,
+                'stack': 'spending'
+            },
+            {
+                'label': 'Budget Target',
                 'data': budgets,
-                'backgroundColor': '#0000FF',  # Solid blue
+                'backgroundColor': '#0000FF',
                 'borderColor': '#0000FF',
                 'borderWidth': 1
             }
