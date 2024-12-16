@@ -1,15 +1,14 @@
 from django.shortcuts import render
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
 import json
 
 def budget_chart(request):
     # Sample data - you can replace this with your actual data source
     data = {
-        'date': ['2023-01-01', '2023-02-01', '2023-03-01', '2023-04-01', '2024-01-01', '2024-02-01', '2024-03-01', '2024-04-01'],
-        'total': [700, 1000, 900, 1000, 1200, 800, 1500, 1300],
-        'budget': [700, 1000, 900, 1000, 1200, 800, 1500, 1300],
+        'date': ['2024-01-01', '2024-02-01', '2024-03-01', '2024-01-01', '2024-02-01', '2024-03-01'],
+        'total': [1000, 1200, 800, 1500, 1300, 900],
+        'budget': [1200, 1200, 1200, 1500, 1500, 1500],
     }
     
     df = pd.DataFrame(data)
@@ -24,16 +23,38 @@ def budget_chart(request):
     # Filter data for selected year
     filtered_df = df[df['year'] == int(selected_year)]
     
-    # Create the bar chart
-    fig = px.bar(filtered_df, x='month', y=['total', 'budget'],
-                 title=f'Budget vs Actual Spending {selected_year}',
-                 labels={'value': 'Amount ($)', 'variable': 'Type'},
-                 barmode='group')
+    # Prepare data for Chart.js
+    months = filtered_df['month'].tolist()
+    totals = filtered_df['total'].tolist()
+    budgets = filtered_df['budget'].tolist()
     
-    chart_json = fig.to_json()
+    chart_data = {
+        'labels': months,
+        'datasets': [
+            {
+                'label': 'Actual Spending',
+                'data': totals,
+                'backgroundColor': '#00FF00',  # Solid green
+                'borderColor': '#00FF00',
+                'borderWidth': 1
+            },
+            {
+                'label': 'Budget',
+                'data': budgets,
+                'backgroundColor': '#0000FF',  # Solid blue
+                'borderColor': '#0000FF',
+                'borderWidth': 1
+            }
+        ]
+    }
+    
+    # Debug print
+    print("Chart Data:", json.dumps(chart_data, indent=2))
+    print("Years:", years)
+    print("Selected Year:", selected_year)
     
     context = {
-        'chart': chart_json,
+        'chart_data': json.dumps(chart_data),
         'years': years,
         'selected_year': selected_year,
     }

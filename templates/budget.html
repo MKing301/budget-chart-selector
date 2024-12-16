@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Budget Visualization</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +23,7 @@
         }
         .chart-container {
             margin-top: 20px;
+            height: 400px;
         }
         select {
             padding: 8px;
@@ -50,12 +51,50 @@
         <form id="year-form" method="get">
         </form>
 
-        <div class="chart-container" id="chart"></div>
+        <div class="chart-container">
+            <canvas id="budgetChart"></canvas>
+        </div>
     </div>
 
     <script>
-        var chartData = {{ chart|safe }};
-        Plotly.newPlot('chart', chartData.data, chartData.layout);
+        var ctx = document.getElementById('budgetChart').getContext('2d');
+        var chartData = {{ chart_data|safe }};
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Budget vs Actual Spending {{ selected_year }}',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount ($)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
